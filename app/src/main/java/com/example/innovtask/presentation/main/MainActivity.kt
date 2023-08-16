@@ -3,10 +3,16 @@ package com.example.innovtask.presentation.main
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.innovtask.R
 import com.example.innovtask.databinding.ActivityMainBinding
 import com.example.innovtask.presentation.main.adapter.ScreenPagerAdapter
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,6 +20,7 @@ class MainActivity : AppCompatActivity() {
 
     private var _screenPagerAdapter: ScreenPagerAdapter? = null
     private val screenPagerAdapter get() = _screenPagerAdapter!!
+    private val viewModel: MainViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +29,23 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
         setupViewPagerWithTabLayout()
+        requestData()
+        observeData()
 
+    }
+
+    private fun requestData() {
+        viewModel.getCoachName()
+    }
+
+    private fun observeData() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.coachState.collectLatest {
+                    binding.cocahName.text = it
+                }
+            }
+        }
     }
 
     private fun setupViewPagerWithTabLayout() {
