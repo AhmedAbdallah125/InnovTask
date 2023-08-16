@@ -10,6 +10,6 @@ import org.koin.dsl.module
 
 val appModule = module {
     factory<RemoteSource> { MockRemoteSource(androidContext()) }
-    single<IRepository> { ConcreteRepository(get()) }
+    factory <IRepository> { ConcreteRepository(get()) }
     factory { MainViewModel(get()) }
 }
